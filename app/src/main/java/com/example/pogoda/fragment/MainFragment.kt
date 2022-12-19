@@ -1,18 +1,45 @@
 package com.example.pogoda.fragment
 
+import android.Manifest
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.activityViewModels
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.example.pogoda.MainViewModel
 import com.example.pogoda.R
+import com.example.pogoda.adapters.VpAdapter
+import com.example.pogoda.adapters.WeatherModel
 import com.example.pogoda.databinding.FragmentMainBinding
+import com.google.android.material.tabs.TabLayoutMediator
+import com.squareup.picasso.Picasso
+import org.json.JSONObject
 
+const val API_KEY = "99fc114fc1924d168b382218221412"
 
 class MainFragment : Fragment() {
-    private lateinit var binding:FragmentMainBinding
+    private val fList = listOf(
+        HoursFragment.newInstance(),
+        DaysFragment.newInstance()
 
+    )
 
+    private val tList = listOf(
+        "Hours",
+        "Days"
+    )
+    private lateinit var plauncher: ActivityResultLauncher<String>
+    private lateinit var binding: FragmentMainBinding
+    private val model:MainViewModel by  activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,10 +50,135 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    companion object {
-            @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-                MainFragment()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        checkPermission()
+        init()
+        updateCurrentCard()
+        requestWeatherData("Almaty")
+    }
+
+    private fun init() = with(binding) {
+        val adapter = VpAdapter(activity as FragmentActivity, fList)
+        vp.adapter = adapter
+        TabLayoutMediator(tabLayout, vp) { tab, pos ->
+            tab.text = tList[pos]
+        }.attach()
+
+    }
+
+    private fun updateCurrentCard() = with(binding){
+        model.liveDataCurrent.observe(viewLifecycleOwner){
+            val maxMinTemp = "${it.maxTemp}C / ${it.minTemp}C"
+            tvData.text= it.time
+            tvCity.text =it.city
+            tvCurrentTemp.text = it.currentTemp
+            tvCondition.text = it.condition
+            tvMaxMin.text = maxMinTemp
+            Picasso.get().load("https:"+it.imageUrl).into(imWeather)
+
+        }
+    }
+
+    private fun checkPermission() {
+        if (!isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            permissionListener()
+            plauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        }
+    }
+
+
+    private fun permissionListener() {
+        plauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) {
+            Toast.makeText(activity, "permossion is $it", Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+    private fun requestWeatherData(city: String) {
+
+        val url = "https://api.weatherapi.com/v1/forecast.json?key=" +
+                API_KEY +
+                "&q=" +
+                city +
+                "&days=" +
+                "3" +
+                "&aqi=no&alerts=no"
+
+        val queue = Volley.newRequestQueue(context)
+        val stringRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            { response ->
+                parseWeatherData(response)
+
+
+                // Toast.makeText(applicationContext, "text!!!!", Toast.LENGTH_SHORT).show()
+            },
+            { error ->
+                Log.d("MyLog", "Volley error: $error !!!!!!!!!!")
             }
+        )
+        queue.add(stringRequest)
+    }
+
+    private fun parseWeatherData(result: String) {
+        val mainObject = JSONObject(result)
+        val list  = parseDaysData(mainObject)
+        parseCurrentData(mainObject,list[0])
+    }
+
+    private fun parseDaysData(mainObject: JSONObject):List<WeatherModel>{
+        val list=ArrayList<WeatherModel>()
+        val daysArray= mainObject.getJSONObject("forecast")
+            .getJSONArray("forecastday")
+        val name   =  mainObject.getJSONObject("location").getString("name")
+
+        for (i in 0 until daysArray.length()){
+            val day = daysArray[i] as JSONObject
+            val item = WeatherModel(
+                name,
+                day.getString("date"),
+                day.getJSONObject("day").getJSONObject("condition").getString("text"),
+                "",
+                day.getJSONObject("day").getJSONObject("condition").getString("icon"),
+
+                day.getJSONObject("day").getString("maxtemp_c"),
+                day.getJSONObject("day").getString("mintemp_c"),
+                day.getJSONArray("hour").toString()
+            )
+            list.add(item)
+        }
+        model.liveDataList.value=list
+        return list
+    }
+
+    private fun parseCurrentData(mainObject:JSONObject, weatherItem:WeatherModel){
+
+        val item = WeatherModel(
+            mainObject.getJSONObject("location").getString("name"),
+            mainObject.getJSONObject("current").getString("last_updated"),
+            mainObject.getJSONObject("current")
+                .getJSONObject("condition").getString("text"),
+            mainObject.getJSONObject("current").getString("temp_c"),
+            mainObject.getJSONObject("current")
+                .getJSONObject("condition").getString("icon"),
+            weatherItem.maxTemp,
+            weatherItem.minTemp,
+            weatherItem.hours
+        )
+        model.liveDataCurrent.value = item
+
+
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            MainFragment()
+    }
 
 }

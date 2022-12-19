@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun getResult(name: String){
 
 
-      val url =   "https://api.weatherapi.com/v1/current.json?key=cc4676ce8a414b199a1101426220311&q=London&aqi=no"
+      val url =   "https://api.weatherapi.com/v1/current.json?key=99fc114fc1924d168b382218221412&q=London&aqi=no"
 
         val queue= Volley.newRequestQueue(this)
         val stringRequest = StringRequest(Request.Method.GET,

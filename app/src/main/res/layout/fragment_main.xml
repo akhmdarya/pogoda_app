@@ -4,17 +4,158 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.MainFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    android:visibility="visible">
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+
+
+        android:layout_height="wrap_content"
+        android:alpha="0.9"
+        android:scaleType="fitXY"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="5dp"
+
+        android:layout_marginTop="5dp"
+        android:backgroundTint="@color/card_blue_bg"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.174" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="377dp"
+            android:layout_height="213dp">
+
+            <ImageView
+                android:id="@+id/imWeather"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_baseline_android_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <TextView
+                android:id="@+id/tvData"
+                android:layout_width="wrap_content"
+                android:layout_height="27dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/aladin"
+                android:text="20/07/2022 13:00"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/aladin"
+                android:text="Madrid"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imWeather" />
+
+            <TextView
+                android:id="@+id/tvCurrentTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aladin"
+                android:text="20 C"
+                android:textColor="@color/white"
+                android:textSize="48sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCity" />
+
+            <TextView
+                android:id="@+id/tvCondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aladin"
+                android:text="Sunny"
+                android:textColor="#FFFFFF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCurrentTemp" />
+
+            <TextView
+                android:id="@+id/tvMaxMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/aladin"
+                android:text="35C / 20C"
+                android:textColor="#FFFFFF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCondition" />
+
+            <ImageButton
+                android:id="@+id/ibSync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_baseline_sync_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.045"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.862" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="24dp"
+        android:background="@color/card_blue_bg"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:tabTextColor="@color/white">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hours" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Days" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/tabLayout"
+        app:layout_constraintStart_toStartOf="@+id/tabLayout"
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>
